@@ -1,6 +1,6 @@
 # chat-with-docs
 
-Input one or more documents to chat-with-docs app, it will generate a summary, and then answer your questions based on the text content. It is currently a demo showing the principle, and there is no subdivision logic yet. Based on the Chat completions api and embedding api of gpt3.5, it is easy to implement with the vector database.
+Input one or more documents to chat-with-docs app, it will generate a summary, and then answer your questions based on the text content. It is currently a demo showing the principle, and there is no subdivision logic yet. Based on the chat completions api and embedding api of gpt3.5, it is easy to implement with the vector database.
 
 ## Setup
 

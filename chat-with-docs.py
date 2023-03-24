@@ -87,7 +87,7 @@ class QA():
                 {'role': 'user', 'content': query},
             ],
         )
-        print("使用的tokens：", response.usage.total_tokens)
+        print("use tokens：", response.usage.total_tokens)
         return response.choices[0].message.content
 
 

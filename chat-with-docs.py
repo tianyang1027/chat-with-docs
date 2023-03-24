@@ -71,7 +71,7 @@ class QA():
             maximum -= l
             if maximum < 0:
                 context = context[:index + 1]
-                print("超过最大长度，截断到前", index + 1, "个片段")
+                print("Exceeded the maximum length，Truncate to first 5 ", index + 1, "strings")
                 break
 
         text = "\n".join(f"{index}. {text}" for index, text in enumerate(context))
@@ -79,7 +79,7 @@ class QA():
             model="gpt-3.5-turbo",
             messages=[
                 {'role': 'system',
-                'content': f'你是一个有帮助的AI文章助手，从下文中提取有用的内容进行回答，不能回答不在下文提到的内容，相关性从高到底排序：\n\n{text}'},
+                'content': f'You are a helpful AI article assistant, extract useful content from the following to answer, if you cannot answer the content that is not mentioned below, the relevance will be sorted from high to low：\n\n{text}'},
                 {'role': 'user', 'content': query},
             ],
         )
@@ -88,9 +88,9 @@ class QA():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Document QA")
-    parser.add_argument("--input_file", default="input.txt", dest="input_file", type=str,help="输入文件路径")
-    parser.add_argument("--file_embeding", default="input_embed.pkl", dest="file_embeding", type=str,help="文件embeding文件路径")
-    parser.add_argument("--print_context", action='store_true',help="是否打印上下文")
+    parser.add_argument("--input_file", default="input.txt", dest="input_file", type=str,help="please input file path")
+    parser.add_argument("--file_embeding", default="input_embed.pkl", dest="file_embeding", type=str,help="embeding file path")
+    parser.add_argument("--print_context", action='store_true',help="Whether to print the context")
     
 
     args = parser.parse_args()
@@ -103,33 +103,33 @@ if __name__ == '__main__':
             texts = [text.strip() for text in texts if text.strip()]
             data_embe,tokens = create_embeddings(texts)
             pickle.dump(data_embe,open(args.file_embeding,'wb'))
-            print("文本消耗 {} tokens".format(tokens))
+            print("text consume {} tokens".format(tokens))
 
     qa =QA(data_embe)
 
     limit = 10
     while True:
-        query = input("请输入查询(help可查看指令)：")
+        query = input("please input prompt(command help can view all commands)：")
         if query == "quit":
             break
         elif query.startswith("limit"):
             try:
                 limit = int(query.split(" ")[1])
-                print("已设置limit为", limit)
+                print("set limit is:", limit)
             except Exception as e:
-                print("设置limit失败", e)
+                print("set limit fail", e)
             continue
         elif query == "help":
-            print("输入limit [数字]设置limit")
-            print("输入quit退出")
+            print("input limit number set limit")
+            print("input quit exit")
             continue
         answer,context = qa(query)
         if args.print_context:
-            print("已找到相关片段：")
+            print("Related snippet found：")
             for text in context:
                 print('\t', text)
             print("=====================================")
-        print("回答如下\n\n")
+        print("Answer\n\n")
         print(answer.strip())
         print("=====================================")
 

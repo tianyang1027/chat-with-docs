@@ -20,11 +20,21 @@
  pip install -r requirements.txt
 ```
 
-5. Setup app
+4. Set openai key
+
+```bash
+ set OPENAI_API_KEY=sk-xxxxxxxxxxx  (Windows)
+```
+
+```bash
+ export OPENAI_API_KEY=sk-xxxxxxxxxxx  (Linux)
+```
+
+5. Run app
 
 ```bash
 python chat-with-docs.py
-
+```
 
 
 

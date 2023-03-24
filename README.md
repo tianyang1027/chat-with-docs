@@ -20,7 +20,7 @@
  pip install -r requirements.txt
 ```
 
-4. Set openai key
+4. Set openai api key
 
 ```bash
  set OPENAI_API_KEY=sk-xxxxxxxxxxx  (Windows)

@@ -105,18 +105,16 @@ if __name__ == '__main__':
     #     data_embe = pickle.load(open(args.file_embeding, 'rb'))
     # else:
     root_dir = os.path.abspath(os.getcwd())
-    allTexts = ''
+    allTexts = list()
     for index, filename in enumerate(os.listdir(root_dir + '/简历')):
         if filename.endswith('.pdf'):
             # pdf_file = open(os.path.join(root_dir + '\\简历\\', filename), 'rb')
             pdf_reader = PyPDF2.PdfReader(os.path.join(root_dir + '\\简历\\', filename))
-            texts = ''
+            texts = list()
             for page_num in range(len(pdf_reader.pages)):
                 page = pdf_reader.pages[page_num]
-                texts = texts + page.extract_text()
-                print(texts)
-            allTexts = allTexts + texts + '\n'
-    allTexts = [text.strip() for text in allTexts if text.strip()]
+                texts = texts.append(page.extract_text())
+            allTexts = allTexts.append(texts)
     data_embe, tokens = create_embeddings(allTexts)
     data_embe.append(data_embe)
     pickle.dump(data_embe, open("input_embed.pkl", 'wb'))

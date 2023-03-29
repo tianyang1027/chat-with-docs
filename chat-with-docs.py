@@ -1,10 +1,11 @@
-import openai
-import faiss
-import numpy as np
-import pickle
-from tqdm import tqdm
 import argparse
 import os
+import pickle
+import PyPDF2
+import faiss
+import numpy as np
+import openai
+from tqdm import tqdm
 
 
 def create_embeddings(input):
@@ -75,7 +76,7 @@ class QA():
             maximum -= l
             if maximum < 0:
                 context = context[:index + 1]
-                print("超过最大长度，截断到前", index + 1, "个片段")
+                # print("超过最大长度，截断到前", index + 1, "个片段")
                 break
 
         text = "\n".join(f"{index}. {text}" for index, text in enumerate(context))
@@ -100,41 +101,48 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    if os.path.isfile(args.file_embeding):
-        data_embe = pickle.load(open(args.file_embeding, 'rb'))
-    else:
-        with open(args.input_file, 'r', encoding='utf-8') as f:
-            texts = f.readlines()
-            texts = [text.strip() for text in texts if text.strip()]
-            data_embe, tokens = create_embeddings(texts)
-            pickle.dump(data_embe, open(args.file_embeding, 'wb'))
-            print("文本消耗 {} tokens".format(tokens))
+    # if os.path.isfile("input_embed1.pkl")
+    #     data_embe = pickle.load(open(args.file_embeding, 'rb'))
+    # else:
+    root_dir = os.path.abspath(os.getcwd())
+    allTexts = list()
+    for index, filename in enumerate(os.listdir(root_dir + '/简历')):
+        if filename.endswith('.pdf'):
+            # pdf_file = open(os.path.join(root_dir + '\\简历\\', filename), 'rb')
+            pdf_reader = PyPDF2.PdfReader(os.path.join(root_dir + '\\简历\\', filename))
+            texts = list()
+            for page_num in range(len(pdf_reader.pages)):
+                page = pdf_reader.pages[page_num]
+                texts = texts.append(page.extract_text())
+            allTexts = allTexts.append(texts)
+    data_embe, tokens = create_embeddings(allTexts)
+    data_embe.append(data_embe)
+    pickle.dump(data_embe, open("input_embed.pkl", 'wb'))
 
-    qa = QA(data_embe)
+qa = QA(data_embe)
 
-    limit = 10
-    while True:
-        query = input("请输入查询(help可查看指令)：")
-        if query == "quit":
-            break
-        elif query.startswith("limit"):
-            try:
-                limit = int(query.split(" ")[1])
-                print("已设置limit为", limit)
-            except Exception as e:
-                print("设置limit失败", e)
-            continue
-        elif query == "help":
-            print("输入limit [数字]设置limit")
-            print("输入quit退出")
-            continue
-        answer, context = qa(query)
-        if args.print_context:
-            print("已找到相关片段：")
-            for text in context:
-                print('\t', text)
-            print("=====================================")
-        print("回答如下\n\n")
-        print(answer.strip())
+limit = 10
+while True:
+    query = input("请输入查询(help可查看指令)：")
+    if query == "quit":
+        break
+    elif query.startswith("limit"):
+        try:
+            limit = int(query.split(" ")[1])
+            print("已设置limit为", limit)
+        except Exception as e:
+            print("设置limit失败", e)
+        continue
+    elif query == "help":
+        print("输入limit [数字]设置limit")
+        print("输入quit退出")
+        continue
+    answer, context = qa(query)
+    if args.print_context:
+        print("已找到相关片段：")
+        for text in context:
+            print('\t', text)
         print("=====================================")
-
+    print("回答如下\n\n")
+    print(answer.strip())
+    print("=====================================")

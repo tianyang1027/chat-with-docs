@@ -76,7 +76,7 @@ class QA():
             maximum -= l
             if maximum < 0:
                 context = context[:index + 1]
-                print("超过最大长度，截断到前", index + 1, "个片段")
+                # print("超过最大长度，截断到前", index + 1, "个片段")
                 break
 
         text = "\n".join(f"{index}. {text}" for index, text in enumerate(context))
@@ -105,6 +105,7 @@ if __name__ == '__main__':
         data_embe = pickle.load(open(args.file_embeding, 'rb'))
     else:
         root_dir = os.path.abspath(os.getcwd())
+        allTexts = []
         for filename in os.listdir(root_dir + '/简历'):
             if filename.endswith('.pdf'):
 
@@ -115,8 +116,10 @@ if __name__ == '__main__':
                     page = pdf_reader.pages[page_num]
                     texts.append(page.extract_text())
                 texts = [text.strip() for text in texts if text.strip()]
-                data_embe, tokens = create_embeddings(texts)
-                pickle.dump(data_embe, open(args.file_embeding, 'wb'))
+                allTexts.append(texts)
+        data_embe, tokens = create_embeddings(allTexts)
+        data_embe.append(data_embe)
+        pickle.dump(data_embe, open(filename + "_input_embed.pkl", 'wb'))
 
     qa = QA(data_embe)
 

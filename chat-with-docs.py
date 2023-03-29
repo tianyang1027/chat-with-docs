@@ -1,10 +1,11 @@
-import openai
-import faiss
-import numpy as np
-import pickle
-from tqdm import tqdm
 import argparse
 import os
+import pickle
+import PyPDF2
+import faiss
+import numpy as np
+import openai
+from tqdm import tqdm
 
 
 def create_embeddings(input):
@@ -103,12 +104,19 @@ if __name__ == '__main__':
     if os.path.isfile(args.file_embeding):
         data_embe = pickle.load(open(args.file_embeding, 'rb'))
     else:
-        with open(args.input_file, 'r', encoding='utf-8') as f:
-            texts = f.readlines()
-            texts = [text.strip() for text in texts if text.strip()]
-            data_embe, tokens = create_embeddings(texts)
-            pickle.dump(data_embe, open(args.file_embeding, 'wb'))
-            print("文本消耗 {} tokens".format(tokens))
+        root_dir = os.path.abspath(os.getcwd())
+        for filename in os.listdir(root_dir + '/简历'):
+            if filename.endswith('.pdf'):
+
+                # pdf_file = open(os.path.join(root_dir + '\\简历\\', filename), 'rb')
+                pdf_reader = PyPDF2.PdfReader(os.path.join(root_dir + '\\简历\\', filename))
+                texts = []
+                for page_num in range(len(pdf_reader.pages)):
+                    page = pdf_reader.pages[page_num]
+                    texts.append(page.extract_text())
+                texts = [text.strip() for text in texts if text.strip()]
+                data_embe, tokens = create_embeddings(texts)
+                pickle.dump(data_embe, open(args.file_embeding, 'wb'))
 
     qa = QA(data_embe)
 
@@ -137,4 +145,3 @@ if __name__ == '__main__':
         print("回答如下\n\n")
         print(answer.strip())
         print("=====================================")
-
